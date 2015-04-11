@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * 
  * @author Guruprasad Bhaskar
@@ -13,6 +15,7 @@ public class FileReader {
 	
 	private String directoryName;
 	private List<File> fileNames ;
+	private static Logger log = Logger.getLogger(FileReader.class);
 	
 	public FileReader() {
 		directoryName = "";
@@ -21,6 +24,7 @@ public class FileReader {
 	
 	public List<File> loadDataFiles() throws Exception {
 		
+		log.debug("++ loadDataFiles");		
 		if(directoryName == null) {
 			throw new Exception("Please provide a valid directoryName from where to pick up files..");
 		}		
@@ -30,6 +34,7 @@ public class FileReader {
 		for(File file : files) {
 			fileNames.add(file);
 		}
+		log.debug("-- loadDataFiles");
 		return fileNames;
 	}
 
