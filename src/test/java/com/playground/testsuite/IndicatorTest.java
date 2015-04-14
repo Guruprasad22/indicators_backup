@@ -41,10 +41,25 @@ public class IndicatorTest {
     	}
 	}
 	
-	@Test
+//	@Test
 	public void doDBTest() throws IOException, SQLException {
 		DatabaseService dbService = new DatabaseService();
 		dbService.setUp();
 		dbService.createDatabaseTables();
 	}
+	
+//	@Test
+	public void doDataValidation() throws Exception {
+		
+		DatabaseService dbService = new DatabaseService();
+		dbService.doValidation();
+	}
+	
+	@Test
+	public void commitRecords() throws Exception {
+		
+		DatabaseService databaseService =  new DatabaseService();
+		databaseService.commitRecords();		
+	}
+	
 }
