@@ -35,7 +35,7 @@ public class IndicatorTest {
 		FileReaderService reader =  new FileReaderService();
     	reader.setDirectoryName("C:\\Vault\\bhav");
     	List<File> files = reader.loadDataFiles();
-    	List<Ticker> tickers = reader.readDataFiles();
+    	List<Ticker> tickers = reader.readDataFiles(files);
     	for(Ticker t : tickers) {
     		System.out.println(t);
     	}

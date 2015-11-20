@@ -42,6 +42,7 @@ public class FileReaderService {
 		
 		File[] files = dir.listFiles(); // get all files under the directory
 		for(File file : files) {
+			log.debug(file);
 			fileNames.add(file);
 		}
 		log.debug("-- loadDataFiles");
@@ -51,13 +52,13 @@ public class FileReaderService {
 	/*
 	 * read the content of files and add to List
 	 */
-	public List<Ticker> readDataFiles() throws Exception {
+	public List<Ticker> readDataFiles(List<File> files) throws Exception {
 		log.debug("++ readDataFiles");
-		if(fileNames.isEmpty()) {
+		if(files.size() == 0) {
 			throw new Exception("No new files to read from!!");
 		}
 		
-		for(File file: getFileNames()) {
+		for(File file: files) {
 			boolean firstLine = true;
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String line = "";

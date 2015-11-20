@@ -13,7 +13,6 @@ import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
 import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 import com.playground.model.Ticker;
-import com.playground.utility.StringToPojo;
 
 
 public class DatabaseService {
@@ -58,6 +57,7 @@ public class DatabaseService {
 	 * check if files are already committed to database
 	 */
 	public List<File> doValidation() throws Exception {
+		log.debug("++++doValidation");
 		 // read all the ticker files already inserted into database
 		 List<String> tickerFiles =  (List<String>) sqlMap.queryForList("getFilenames");
 		 
@@ -77,27 +77,31 @@ public class DatabaseService {
 		 List<File> inputFiles = fileReaderService.loadDataFiles();
 		 for(File f : inputFiles) {
 			 if(!tickerFiles.contains(f.getName())) {
+				 log.debug(f);
 				 filteredFiles.add(f);
 			 }
-		 }		 
+		 }
+		 log.debug("----doValidation");
 		 return filteredFiles;
 	}
 	
-	// fetch the tickers and commit them to database
+	/**
+	 * the method checks a given directory for list of files
+	 * it removes files that are already committed to database
+	 * then converts them to POJOs and invokes the insert command through ibatis
+	 * @throws Exception
+	 */
 	public void commitRecords() throws Exception {
-		
-		FileReaderService reader =  new FileReaderService();
-    	reader.setDirectoryName("C:\\Vault\\bhav");
-    	List<File> files = reader.loadDataFiles();
-    	List<Ticker> tickers = reader.readDataFiles();
+		log.debug("++++commitRecords");
+		FileReaderService reader =  new FileReaderService();		
+    	List<File> files = doValidation();
+    	List<Ticker> tickers = reader.readDataFiles(files); //inserting only the delta files from source directory
+    	log.debug("ticker size is " + tickers.size());
 	
 		long startTime  = System.currentTimeMillis();
-		
+		//insert tickers into table ticker
 		sqlMap.startTransaction();
 		sqlMap.startBatch();
-		String line = null;
-		
-		StringToPojo stringToPojo = new StringToPojo();
 		
 		for(Ticker ticker: tickers) {
 			sqlMap.insert("insertTicker",ticker);
@@ -105,11 +109,12 @@ public class DatabaseService {
 		
 		sqlMap.executeBatch();
 		sqlMap.commitTransaction();
-		 
+		
+		//insert the filenames into table files
 		sqlMap.startTransaction();
 		sqlMap.startBatch();
 		 
-		for(File f: doValidation()) {
+		for(File f: files) {
 		 log.info("Inserting file " + f.getName() + " into database ");
 		 sqlMap.insert("insertFile",new String(f.getName()));
 		}
@@ -119,6 +124,6 @@ public class DatabaseService {
 		 
 		long endTime  = System.currentTimeMillis();
 		log.info("Total time taken = " + (endTime- startTime)/1000 + " seconds");
-		
+		log.debug("++++commitRecords");
 	}
 }
